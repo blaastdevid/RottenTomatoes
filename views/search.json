@@ -1,0 +1,39 @@
+{
+	"style": {
+		"background-color": "#ebf4fb",
+		"border": 10
+	},
+
+	"contents": [
+		{
+			"name": "tvFilmName",
+			"control": "TextView",
+			"label": "Film Name"
+		},
+		{
+			"name": "ibFilmName",
+			"control": "InputBox",
+			style: {
+				'background-color': 'white',
+				width: 'fill-parent',
+				height: 25
+			}
+		},
+		{
+			"name": "button-box",
+			"control": "VLayout",
+			"contents":[
+				{
+					"control": "Control",
+					style: {
+						width: 'fill-parent',
+						height: 20
+					}
+				},{
+					"name": "bSearch",
+					"control": "ImageView"
+				}
+			]
+		}
+	]
+}

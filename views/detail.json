@@ -1,0 +1,116 @@
+{
+	"style": {
+		"background-color": "#ebf4fb",
+		"border": 10,
+		"overflow": true
+	},
+
+	"contents": [
+		{
+			"control": "VLayout",
+			"name": "header",
+			"style": {
+				"padding": 5,
+				"border": "5 10 5 10"
+			},
+			"contents": [
+				{
+					"control": "VLayout",
+					"name": "pic-box"
+				},
+				{
+					"control": "HLayout",
+					"name": "title-box",
+					"contents": [
+						{
+							"control": "TextView",
+							"name": "title",
+							"style": {
+								"font-weight": "bold",
+								"color": "black"
+							}
+						},
+						{
+							"control": "TextView",
+							"name": "year",
+							"style": {
+								"color": "black"
+							}
+						},
+						{
+							"control": "TextView",
+							"name": "rating",
+							"style": {
+								"color": "black"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"control": "TextView",
+			"name": "genre",
+			"style": {
+				"width": "fill-parent",
+				"border": "0 10 5 10"
+			}
+		},
+		{
+			"control": "TextView",
+			"name": "released",
+			"style": {
+				"width": "fill-parent",
+				"border": "0 10 5 10"
+			}
+		},
+		{
+			"control": "TextView",
+			"name": "runtime",
+			"style": {
+				"width": "fill-parent",
+				"border": "0 10 5 10"
+			}
+		},
+		{
+			"control": "TextView",
+			"name": "rated",
+			"style": {
+				"width": "fill-parent",
+				"border": "0 10 5 10"
+			}
+		},
+		{
+			"control": "TextView",
+			"name": "director",
+			"style": {
+				"width": "fill-parent",
+				"border": "0 10 5 10"
+			}
+		},
+		{
+			"control": "TextView",
+			"name": "writer",
+			"style": {
+				"width": "fill-parent",
+				"border": "0 10 5 10"
+			}
+		},
+		{
+			"control": "TextView",
+			"name": "actors",
+			"style": {
+				"width": "fill-parent",
+				"border": "0 10 5 10"
+			}
+		},
+		{
+			"control": "TextView",
+			"name": "plot",
+			"style": {
+				"width": "fill-parent",
+				"border": "0 10 5 10"
+			}
+		}
+	]
+}

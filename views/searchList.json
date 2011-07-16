@@ -1,0 +1,32 @@
+{
+	"style": {
+		"background-color": "#ebf4fb",
+		"border": 10,
+		"overflow": true
+	},
+
+	"contents": [
+		{
+			"control": "TextView",
+			"name": "title",
+			"label": "Search Result",
+			"style": {
+				"font-weight": "bold",
+				"color": "white",
+				"width": "fill-parent",
+				"background-color": "black"
+			}
+		},
+		{
+			"control": "HLayout",
+			"name": "content",
+			"style": {
+				"padding": 5,
+				"border": "5 10 5 10"
+			},
+			"contents": [
+			]
+		}
+		
+	]
+}
