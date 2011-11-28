@@ -113,15 +113,7 @@ _.extend(exports, {
 			if (next > 0) {
 				next = 0;
 			} else if (next <= ((totalHeight - self.dimensions().height) * -1)) {
-                if(!self.flagHitHere) {
-                    next = ((totalHeight - self.dimensions().height) * -1);
-                } else {
-                    self.focusItem(0);
-                    //silahkan melakukan selection disini untuk control'' yang di bawahnya, angka 0 itu
-                    //di dapat dari index dari komponent di dalam view induk (self)
-                    return;
-                }
-                self.flagHitHere = true;
+                next = ((totalHeight - self.dimensions().height) * -1);
 			}
 			self.sct = next;
 			console.log(key + ' - ' + next + ' * ' + ((totalHeight - self.dimensions().height) * -1));
