@@ -5,17 +5,15 @@ var app = this;
 
 _.extend(exports, {
 	initialize: function(type) {
-		/* XXX workaround runtime bug */
+		var self = this;
 		this.type  = type[0];
-		console.log('hereeeeeee ' + this.type);
+		self.userStorage = app.storage(self.type);		
 	},
 
 	':attached': function(param) {
 		var self = this;
 		
-		this.parseMovies = function(action, args) {
-			console.log(action);
-			console.log(self.type);
+		this.parseMovies = function(action, args, flag) {
 			if (action === self.type) {
 				if (args.error) {
 					console.log(self.type, 'failed:', args.error);
@@ -29,32 +27,46 @@ _.extend(exports, {
 						self.add(movie.id, new Single(movie));
 					}
 				});
+				
+				if (!flag) {
+					self.userStorage.remove('cache');
+					self.userStorage.set('cache', args);
+				}
 			}
 		};
 
 		app.on('message', this.parseMovies);
+		
+		if (self.userStorage.get('cache')) {
+			this.parseMovies(self.type, self.userStorage.get('cache'), true);
+		}
 	},
-
+	
 	clearUpdate: function() {
-		//if (this.updateTweets) {
-		//	app.removeListener('connected', this.updateTweets);
-		//	delete this.updateTweets;
-		//}
+		if (this.updateMovies) {
+			app.removeListener('connected', this.updateMovies);
+			delete this.updateMovies;
+		}
 	},
 
-	':focus': function() {
+	':active': function() {
 		var self = this;
 
 		this.updateMovies = function() {
 			app.msg(self.type);
-			//self.clearUpdate();
+			self.clearUpdate();
 		};
 
-		app.on('connected', this.updateMovies);
+		if (!self.userStorage.get('cache')) {
+			app.on('connected', this.updateMovies);
+		} else {
+			this.parseMovies(self.type, self.userStorage.get('cache'), true);
+		}
 	},
 
-	':blur': function() {
+	':inactive': function() {
 		this.clearUpdate();
+		this.clear();
 	},
 
 	':keypress': function(key) {

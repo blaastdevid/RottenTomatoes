@@ -8,7 +8,10 @@
 		{
 			"name": "tvFilmName",
 			"control": "TextView",
-			"label": "Film Name"
+			"label": "Film Name",
+			"style": {
+				"font-weight": "bold"
+			}
 		},
 		{
 			"name": "ibFilmName",
@@ -22,6 +25,9 @@
 		{
 			"name": "button-box",
 			"control": "VLayout",
+			"style": {
+				"border": "3 0 0 0"
+			},
 			"contents":[
 				{
 					"control": "Control",
@@ -30,8 +36,23 @@
 						height: 20
 					}
 				},{
-					"name": "bSearch",
-					"control": "ImageView"
+					"name": "bSearchContainer",
+					"control": "LinearLayout",
+					"style": {
+						"border": "1 1 1 1",
+						'background-color': 'black'
+					},
+					"contents": [
+						{
+							"control": "TextView",
+							"name": "bSearch",
+							"label": "Search",
+							"style": {
+								'border' : '2 4 2 4',
+								'background-color' : '#e6eaf2'
+							}
+						}
+					]
 				}
 			]
 		}

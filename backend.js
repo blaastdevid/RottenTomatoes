@@ -11,9 +11,9 @@ var rlog = new ReqLog(app.log);
 var scaling = new Scaling(app.config);
 
 var basicUrl = 'http://api.rottentomatoes.com/api/public/v1.0/';
-var basicParam = {apikey: 'uygx44prkgbsefqhhzu6m224', country: 'id', _prettyprint: 'true'};
+var basicParam = {apikey: 'uygx44prkgbsefqhhzu6m224', country: 'id', _prettyprint: 'false'};
 
-var debug = true;
+var debug = false;   
 
 function RottenTomatoesAPI(){
 }
@@ -24,7 +24,9 @@ RottenTomatoesAPI.prototype = {
         
         _.extend(param, basicParam);
         url = basicUrl + url + '?' + QS.stringify(param);
-        console.log('Request: ' + url);
+        if(debug) {
+            console.log('Request: ' + url);
+        }
         http.get(url, {
             ok: function(data) {
                 if(debug) {
@@ -72,31 +74,46 @@ function RottenTomatoesUser(client, api){
 
 RottenTomatoesUser.prototype = {
     
+    _manageResult: function(result) {
+	delete result.link_template;
+	delete result.links;
+	delete result.total;
+	result.movies.forEach(function(movie){
+	    delete movie.links;
+	    delete movie.alternate_ids;
+	    delete movie.abridged_cast;
+	    delete movie.posters.profile;
+	    delete movie.posters.original;
+	    delete movie.critics_consensus;
+	});
+	return result;
+    },
+    
     upcoming: function(args){
         var self = this;
         this.api.upcoming(function(action, result) {
-            self.client.msg(action, result);
+            self.client.msg(action, self._manageResult(result));
         });
     },
     
     inTheaters: function(args){
         var self = this;
         this.api.inTheaters(function(action, result) {
-            self.client.msg(action, result);
+            self.client.msg(action, self._manageResult(result));
         });
     },
     
     opening: function(args) {
         var self = this;
         this.api.opening(function(action, result) {
-            self.client.msg(action, result);
+            self.client.msg(action, self._manageResult(result));
         });
     },
     
     boxOffice: function(args) {
         var self = this;
         this.api.boxOffice(function(action, result) {
-            self.client.msg(action, result);
+            self.client.msg(action, self._manageResult(result));
         });
     },
     
@@ -110,14 +127,14 @@ RottenTomatoesUser.prototype = {
     searchMovies: function(args) {
         var self = this;
         this.api.searchMovies(args.query, function(action, result) {
-            self.client.msg(action, result);
+            self.client.msg(action, self._manageResult(result));
         });
     }
 };
 
 app.message(function(client, action, args) {
     var self = this;
-    if (action.length > 0 && RottenTomatoesUser.prototype.hasOwnProperty(action)) {
+    if (action && action.length > 0 && RottenTomatoesUser.prototype.hasOwnProperty(action)) {
         app.debug(client.header() + ' action="' + action + '"');
         var user = new RottenTomatoesUser(client, new RottenTomatoesAPI());
         user[action].apply(user, [args]);
@@ -127,7 +144,10 @@ app.message(function(client, action, args) {
 });
 
 app.setResourceHandler(function(request, response) {
-    var r = rlog.start(request.id);
+    var url = request.id.substring(3);
+    var length = parseInt(request.id.substring(0,3), 0);
+    
+    var r = rlog.start(url);
 
     function sendReply(response, error, imageType, data) {
         if (error) {
@@ -138,8 +158,7 @@ app.setResourceHandler(function(request, response) {
             response.reply(imageType, data);
         }
     }
-    
-    scaling.scale(request.id, request.display_width, request.display_height, 'image/jpeg',
+    scaling.scale(url, length, length, 'image/jpeg',
         function(err, data) {
             sendReply(response, err, 'image/jpeg', data);
         }

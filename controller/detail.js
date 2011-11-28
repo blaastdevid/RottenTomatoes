@@ -18,58 +18,62 @@ function parseDirector(param) {
 	return directors.substring(0, directors.length - 2);
 }
 
+function getTotalHeight(controls) {
+	var total = 0;
+	controls.forEach(function each(item){
+		total += item.dimensions().height;
+	});
+	total += 20;
+	return total;
+}
+
 
 _.extend(exports, {
-	
-	':load': function() {
-		var self = this;
-		self.selected = self.keySelectionWithItems([self.get('header').get('title-box').get('title'),
-			self.get('header').get('title-box').get('year'),
-			self.get('header').get('title-box').get('rating'),
-			self.get('genre'),
-			self.get('released'),
-			self.get('runtime'),
-			self.get('rated'),
-			self.get('director'),
-			self.get('actors'),
-			self.get('plot')], {});
-	},
-	
 	':state': function(data) {
 		console.log('star');
 		var self = this;
+		self.scrollTo(0);
 		self.get('header').get('pic-box').clear();
 		self.get('header').get('pic-box').add('pic', new ImageView({
 			style: {
 				width: 84,
-				height: 84
+				height: 99,
+				mode: 'centered'
 			}
 		}));
-		app.on('connected', function() {
+		
+		self.updateData = function(action, param){
+			if(action === 'movie'){
+				self.get('genre').label('Genre: ' + parseGenre(param.genres));
+				self.get('director').label('Director: ' + parseDirector(param.abridged_directors));
+				self.get('actors').label('Actors: ' + parseDirector(param.abridged_cast));
+				app.removeListener('message', self.updateData);
+			}else if (action === 'search'){
+				self.get('header').get('pic-box').get('pic').resource('99/' + param.posters.detailed);
+				self.get('header').get('title-box').get('title').label(param.title);
+				self.get('header').get('title-box').get('year').label(param.year);
+				self.get('header').get('title-box').get('rating').label('Rating: ' + param.ratings.audience_score);
+				self.get('plot').label('Plot: ' + param.synopsis);
+				self.get('released').label('Released: ' + param.release_dates.theater);
+				self.get('runtime').label('Runtime: ' + param.runtime);
+				self.get('rated').label('Rated: ' + data.mpaa_rating);
+				self.get('genre').label('Genre: ' + parseGenre(param.genres));
+				self.get('director').label('Director: ' + parseDirector(param.abridged_directors));
+				self.get('actors').label('Actors: ' + parseDirector(param.abridged_cast));
+				app.removeListener('message', self.updateData);
+			}
+		};
+		
+		self.updateScreen = function() {
 			app.msg('movie', {id: data.id});
-			
-			app.on('message', function(action, param){
-				if(action === 'movie'){
-					self.get('genre').label('Genre: ' + parseGenre(param.genres));
-					self.get('director').label('Director: ' + parseDirector(param.abridged_directors));
-					self.get('actors').label('Actors: ' + parseDirector(param.abridged_cast));
-				}else if (action === 'search'){
-					self.get('header').get('pic-box').get('pic').resource(param.posters.detailed);
-					self.get('header').get('title-box').get('title').label(param.title);
-					self.get('header').get('title-box').get('year').label(param.year);
-					self.get('header').get('title-box').get('rating').label('Rating: ' + param.ratings.audience_score);
-					self.get('plot').label('Plot: ' + param.synopsis);
-					self.get('released').label('Released: ' + param.release_dates.theater);
-					self.get('runtime').label('Runtime: ' + param.runtime);
-					self.get('rated').label('Rated: ' + data.mpaa_rating);
-					self.get('genre').label('Genre: ' + parseGenre(param.genres));
-					self.get('director').label('Director: ' + parseDirector(param.abridged_directors));
-					self.get('actors').label('Actors: ' + parseDirector(param.abridged_cast));
-				}
-			});
-		});
+			app.on('message', self.updateData);
+			app.removeListener('connected', self.updateScreen);
+			delete self.updateScreen;
+		};
+		app.on('connected', self.updateScreen);
+		
 		if(data.posters.detailed && data.title && data.year) {
-			self.get('header').get('pic-box').get('pic').resource(data.posters.detailed);
+			self.get('header').get('pic-box').get('pic').resource('99/' + data.posters.detailed);
 			self.get('header').get('title-box').get('title').label(data.title);
 			self.get('header').get('title-box').get('year').label(data.year);
 			self.get('header').get('title-box').get('rating').label('Rating: ' + data.ratings.audience_score);
@@ -80,27 +84,48 @@ _.extend(exports, {
 		}
 	},
 	
+	':inactive': function() {
+		var self = this;
+		app.removeListener('connected', self.updateScreen);
+		delete self.updateScreen;
+		app.removeListener('message', self.updateData);
+		delete self.updateData;
+	},
+	
 	':keypress': function(key) {
-		if (this.index === undefined) {
-			if (this.size() > 0) {
-				this.focusItem(0);
-			}
+		var self = this;
+		var totalHeight = getTotalHeight([
+			self.get('header'),
+			self.get('genre'),
+			self.get('released'),
+			self.get('runtime'),
+			self.get('rated'),
+			self.get('director'),
+			self.get('actors'),
+			self.get('plot')]);
+		
+		if (self.sct === undefined) {
+			self.sct = 0;
+			self.scrollTop(0, 1000);
 		} else if (key === 'up' || key === 'down') {
-			var next = this.index + (key === 'up' ? -1 : 1);
-
-			if (next < 0) {
+			var next = self.sct + (key === 'up' ? 50 : -50);
+			
+			if (next > 0) {
 				next = 0;
-			} else if (next > (this.size()-1)) {
-				next = this.size()-1;
+			} else if (next <= ((totalHeight - self.dimensions().height) * -1)) {
+                if(!self.flagHitHere) {
+                    next = ((totalHeight - self.dimensions().height) * -1);
+                } else {
+                    self.focusItem(0);
+                    //silahkan melakukan selection disini untuk control'' yang di bawahnya, angka 0 itu
+                    //di dapat dari index dari komponent di dalam view induk (self)
+                    return;
+                }
+                self.flagHitHere = true;
 			}
-
-			if (this.index === next) {
-				return;
-			}
-
-			this.focusItem(next);
-		} else if (key === 'fire') {
-			this.get(this.index).emit('activate');
+			self.sct = next;
+			console.log(key + ' - ' + next + ' * ' + ((totalHeight - self.dimensions().height) * -1));
+			self.scrollTop(next, 1000);
 		}
 	},
 	
