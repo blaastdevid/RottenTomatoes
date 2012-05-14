@@ -33,7 +33,7 @@ _.extend(exports, {
 				if (action === 'search') {
 					console.log(data.Title);
 					if (data.Response === 'True') {
-						app.setContent('detail', data);
+						app.pushView('detail', data);
 					}else if (data.Response === 'Parse Error') {
 						console.log('failed to get the data');
 					}

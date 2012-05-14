@@ -16,7 +16,7 @@ _.extend(exports, {
 		});
 		
 		self.get('button-box').get('bSearchContainer').get('bSearch').on('activate', function() {
-			app.setContent('searchList', {query: self.get('ibFilmName').value()});
+			app.pushView('searchList', {query: self.get('ibFilmName').value()});
 		});
 		
 		app.on('message', function(action, data){

@@ -113,7 +113,7 @@ _.extend(exports, {
 			if (next > 0) {
 				next = 0;
 			} else if (next <= ((totalHeight - self.dimensions().height) * -1)) {
-                next = ((totalHeight - self.dimensions().height) * -1);
+				next = ((totalHeight - self.dimensions().height) * -1);
 			}
 			self.sct = next;
 			console.log(key + ' - ' + next + ' * ' + ((totalHeight - self.dimensions().height) * -1));
